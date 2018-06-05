@@ -13,9 +13,10 @@
 
 var coap = require('coap');
 var server = coap.createServer({ type: 'udp6' });
+var Readable = require('stream').Readable;
 
 server.on('request', function(req, res) {
-  res.end('Starting CoAP Client \n')
+  res.end('Starting CoAP Client\n')
 });
 
 server.listen(function() {
@@ -26,17 +27,22 @@ server.listen(function() {
     method: 'GET'
   });
 
+  var rs = new Readable();
+
   req.on('response', function(res) {
-    var response = res.pipe(process.stdout);
+    var response = res.payload;
     console.log('response ', response);
     updateDatabase(response);
   });
+  console.log('rs.pipe(req)');
+  rs.pipe(req);
 
   req.end();
 });
 
 function updateDatabase(val) {
-  var payload = {
+  console.log(typeof(val));
+  /*var payload = {
     values: [{
       key: "demo_resource",
       value: Number(val)
@@ -57,4 +63,5 @@ function updateDatabase(val) {
   });
 
   req.end();
+  */
 };
