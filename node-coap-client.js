@@ -10,12 +10,13 @@
 *
 * References: https://github.com/mcollina/node-coap
 */
+
 var coap = require('coap');
 var server = coap.createServer({ type: 'udp6' });
 
 server.on('request', function(req, res) {
   res.end('Starting CoAP Client \n')
-})
+});
 
 server.listen(function() {
   var req = coap.request({
@@ -27,32 +28,33 @@ server.listen(function() {
 
   req.on('response', function(res) {
     var response = res.pipe(process.stdout);
-    console.log('sensor response ', response);
+    console.log('response ', response);
     updateDatabase(response);
-  })
+  });
 
-  req.end()
+  req.end();
 });
 
-function updateDatabase(val = 0) {
+function updateDatabase(val) {
+  var payload = {
+    values: [{
+      key: "demo_resource",
+      value: val
+    }]
+  };
+
   var req = coap.request({
     host: 'coap.thethings.io',
     pathname: '/v2/things/TOKEN_ID',
     method: 'POST'
   });
-  console.log('response ', val);
-  var coapPayload = {
-    values: [{
-      key: "demo_resource",
-      value: val || 0
-    }]
-  };
-  req.write(JSON.stringify(coapPayload));
+
+  req.write(JSON.stringify(payload));
 
   req.on('response', function(res) {
     var response = res.pipe(process.stdout);
     console.log('thethings.io response: ', response);
-  })
+  });
 
-  req.end()
-}
+  req.end();
+};
