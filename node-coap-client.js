@@ -12,37 +12,38 @@
 */
 
 var coap = require('coap');
+var bl = require('bl');
 var server = coap.createServer({ type: 'udp6' });
-var Readable = require('stream').Readable;
 
 server.on('request', function(req, res) {
   res.end('Starting CoAP Client\n')
 });
 
 server.listen(function() {
-  var req = coap.request({
-    host: 'COAP_IP',
-    pathname: '/sensors/pressure',
-    observe: true,
-    method: 'GET'
-  });
+  coap
+    .request({
+      host: 'COAP_IP',
+      pathname: '/sensors/pressure',
+      observe: true,
+      method: 'GET'
+    })
+    .on('response', function(res) {
+      console.log('error code ', res.code);
+      if (res.code !== '2.05') return process.exit(1);
 
-  var rs = new Readable();
-
-  req.on('response', function(res) {
-    var response = res.payload;
-    console.log('response ', response);
-    updateDatabase(response);
-  });
-  console.log('rs.pipe(req)');
-  rs.pipe(req);
-
-  req.end();
+      res.pipe(bl(function(err, data) {
+        var json = JSON.parse(data)
+        console.log('json ', json)
+        process.exit(0)
+      }))
+    })
+    .end()
 });
 
+/*
 function updateDatabase(val) {
   console.log(typeof(val));
-  /*var payload = {
+  var payload = {
     values: [{
       key: "demo_resource",
       value: Number(val)
@@ -63,5 +64,5 @@ function updateDatabase(val) {
   });
 
   req.end();
-  */
 };
+*/
