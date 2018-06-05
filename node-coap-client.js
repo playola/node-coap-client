@@ -34,17 +34,17 @@ server.listen(function() {
   req.end()
 });
 
-function updateDatabase(response) {
+function updateDatabase(value = 0) {
   var req = coap.request({
     host: 'coap.thethings.io',
     pathname: '/v2/things/TOKEN_ID',
     method: 'POST'
   });
-  console.log('response ', response);
+  console.log('response ', value);
   var payload = {
     values: [{
       key: "demo_resource",
-      value: response
+      value: value || 0
     }]
   };
   req.write(JSON.stringify(payload));
