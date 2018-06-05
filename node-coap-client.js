@@ -39,7 +39,7 @@ function updateDatabase(val) {
   var payload = {
     values: [{
       key: "demo_resource",
-      value: val
+      value: Number(val)
     }]
   };
 
