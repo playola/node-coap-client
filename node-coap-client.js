@@ -28,26 +28,7 @@ server.listen(function() {
   req.on('response', function(res) {
     var response = res.pipe(process.stdout);
     console.log('sensor response ', response);
-    //updateDatabase(response);
-    var reqx = coap.request({
-      host: 'coap.thethings.io',
-      pathname: '/v2/things/TOKEN_ID',
-      method: 'POST'
-    });
-    var payload = {
-      values: [{
-        key: "demo_resource",
-        value: response
-      }]
-    };
-    reqx.write(JSON.stringify(payload));
-
-    reqx.on('response', function(resx) {
-      var responsex = resx.pipe(process.stdout);
-      console.log('thethings.io response: ', responsex);
-    })
-
-    reqx.end()
+    updateDatabase(response);
   })
 
   req.end()
