@@ -30,29 +30,20 @@ server.listen(function() {
     .on('response', function(res) {
       if (res.code !== '2.05') return process.exit(1);
 
-      res.on('pipe', function(src) {
-        console.log(src);
-      })
-      /*
-      console.log('error code ', res.code);
-      res.pipe(bl(function(err, data) {
-        var json = JSON.parse(data)
-        console.log('json ', json)
-        process.exit(0)
-      }));
-      */
-
+      res.on('data', function(src) {
+        var value = src.toString();
+        updateDatabase(value);
+      });
     })
     .end()
 });
 
-/*
-function updateDatabase(val) {
-  console.log(typeof(val));
+function updateDatabase(value) {
+  console.log('update database ', value);
   var payload = {
     values: [{
       key: "demo_resource",
-      value: Number(val)
+      value: Number(value)
     }]
   };
 
@@ -61,7 +52,6 @@ function updateDatabase(val) {
     pathname: '/v2/things/TOKEN_ID',
     method: 'POST'
   });
-
   req.write(JSON.stringify(payload));
 
   req.on('response', function(res) {
@@ -71,4 +61,3 @@ function updateDatabase(val) {
 
   req.end();
 };
-*/
