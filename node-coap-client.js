@@ -39,7 +39,6 @@ server.listen(function() {
 });
 
 function updateDatabase(value) {
-  console.log('update database ', value);
   var payload = {
     values: [{
       key: "demo_resource",
@@ -55,8 +54,7 @@ function updateDatabase(value) {
   req.write(JSON.stringify(payload));
 
   req.on('response', function(res) {
-    var response = res.pipe(process.stdout);
-    console.log('thethings.io response: ', response);
+    console.log('thethings.io response code: ', res.code);
   });
 
   req.end();
