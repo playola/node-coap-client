@@ -22,7 +22,7 @@ server.on('request', function(req, res) {
 server.listen(function() {
   coap
     .request({
-      host: 'COAP_IP',
+      host: 'fd00::212:4b00:11f4:8197',
       pathname: '/sensors/pressure',
       observe: true,
       method: 'GET'
@@ -39,7 +39,7 @@ server.listen(function() {
 });
 
 function updateDatabase(value) {
-  console.log('update database ', value);
+  console.log('update database');
   var payload = {
     values: [{
       key: "demo_resource",
@@ -49,7 +49,7 @@ function updateDatabase(value) {
 
   var req = coap.request({
     host: 'coap.thethings.io',
-    pathname: '/v2/things/TOKEN_ID',
+    pathname: '/v2/things/p6Q2LCPf7lfqeKbe5muZQgOsxvkE2OuYhDE1ptBo4S8',
     method: 'POST'
   });
   req.write(JSON.stringify(payload));
