@@ -12,8 +12,8 @@
 */
 
 var coap = require('coap');
-var bl = require('bl');
 var server = coap.createServer({ type: 'udp6' });
+var secrets = require('../server/secrets.js');
 
 server.on('request', function(req, res) {
   res.end('Starting CoAP Client\n')
@@ -22,7 +22,7 @@ server.on('request', function(req, res) {
 server.listen(function() {
   coap
     .request({
-      host: 'fd00::212:4b00:11f4:8197',
+      host: secrets.getSecret('coapHost'),
       pathname: '/sensors/pressure',
       observe: true,
       method: 'GET'
@@ -49,7 +49,7 @@ function updateDatabase(value) {
 
   var req = coap.request({
     host: 'coap.thethings.io',
-    pathname: '/v2/things/p6Q2LCPf7lfqeKbe5muZQgOsxvkE2OuYhDE1ptBo4S8',
+    pathname: '/v2/things/' + secrets.getSecret('tokenId'),
     method: 'POST'
   });
   req.write(JSON.stringify(payload));
