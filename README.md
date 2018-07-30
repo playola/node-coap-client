@@ -13,5 +13,13 @@ npm install coap --save
 node node-coap-client.js
 ```
 
+## Architecture
+
+### Client
+CoAP client that receives information from the sensor and sends it to the database.
+
+### Server
+*** Developing *** MongoDB connection.
+
 ### References
 * https://github.com/mcollina/node-coap
