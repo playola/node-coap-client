@@ -11,8 +11,6 @@ router.use(function(req, res, next){
 
 router.route('/')
   .post(function(req, res){
-    console.log('Request', req);
-    console.log('Response', res);
     // Initialize model
     var thisPressureModel = new pressureModel();
     // Define values
@@ -28,7 +26,7 @@ router.route('/')
         res.send(err);
       } else {
         console.log('New pressure recorded in the database as:', thisPressureValue);
-        res.send('new pressure recorded to the db');
+        res.send('New pressure recorded to the db');
       }
     });
   });
