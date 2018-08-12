@@ -1,19 +1,16 @@
 /*
-* Author: Pol Layola
-* Date: June 2018
-*
 * Node CoAP Client
 * CoAP Client that observe a sensor and sends its value to a platform.
-* The platforms thethings.io needs a TOKEN_ID to post data into their database.
+* The platform thethings.io needs a TOKEN_ID to post data into their database.
 *
 * Default port 5638. Default action 'GET'
-*
-* References: https://github.com/mcollina/node-coap
 */
 
-var coap = require('coap');
-var server = coap.createServer({ type: 'udp6' });
-var secrets = require('../server/secrets.js');
+var coap = require('coap'),
+    server = coap.createServer({ type: 'udp6' }),
+    secrets = require('../server/secrets.js'),
+    ip = require('ip'),
+    request = require('request');
 
 server.on('request', function(req, res) {
   res.end('Starting CoAP Client\n')
@@ -39,7 +36,8 @@ server.listen(function() {
 });
 
 function updateDatabase(value) {
-  console.log('update database');
+  console.log('update database', value);
+  postPressureIntoDatabase(value);
   var payload = {
     values: [{
       key: "demo_resource",
@@ -60,3 +58,10 @@ function updateDatabase(value) {
 
   req.end();
 };
+
+function postPressureIntoDatabase(value) {
+  var port = 8000;
+  var myIp = 'http://' + ip.address() + ':' + port;
+  console.log('server listening on', myIp);
+  request.post(myIp + '/');
+}

@@ -11,7 +11,8 @@ router.use(function(req, res, next){
 
 router.route('/')
   .post(function(req, res){
-    console.log('Index route is good!');
+    console.log('Request', req);
+    console.log('Response', res);
     // Initialize model
     var thisPressureModel = new pressureModel();
     // Define values
