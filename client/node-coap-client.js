@@ -8,9 +8,9 @@
 
 var coap = require('coap'),
     server = coap.createServer({ type: 'udp6' }),
-    secrets = require('../server/secrets.js'),
     ip = require('ip'),
-    request = require('request');
+    request = require('request'),
+    secrets = require('../server/secrets.js');
 
 server.on('request', function(req, res) {
   res.end('Starting CoAP Client\n')
@@ -40,7 +40,7 @@ function updateDatabase(value) {
   postPressureIntoDatabase(value);
   var payload = {
     values: [{
-      key: "demo_resource",
+      key: 'demo_resource',
       value: Number(value)
     }]
   };
@@ -62,6 +62,6 @@ function updateDatabase(value) {
 function postPressureIntoDatabase(value) {
   var port = 8000;
   var myIp = 'http://' + ip.address() + ':' + port;
-  console.log('server listening on', myIp);
+  console.log('posting on IP: ', myIp);
   request.post(myIp + '/');
 }

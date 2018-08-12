@@ -8,9 +8,9 @@ git clone https://github.com/playola/node-coap-client.git
 
 cd node-coap-client
 
-npm install coap --save
+npm install
 
-node node-coap-client.js
+npm start
 ```
 
 ## Architecture
@@ -22,4 +22,5 @@ CoAP client that receives information from the sensor and sends it to the databa
 *** Developing *** MongoDB connection.
 
 ### References
-* https://github.com/mcollina/node-coap
+* www.github.com/mcollina/node-coap
+* www.justin.isamaker.com/
