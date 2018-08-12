@@ -36,7 +36,7 @@ server.listen(function() {
 });
 
 function updateDatabase(value) {
-  console.log('update database', value);
+  console.log('Update database', value);
   postPressureIntoDatabase(value);
   var payload = {
     values: [{

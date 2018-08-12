@@ -15,3 +15,4 @@ var db = require('./models/databaseModel.js');
 var pressureModel = require('./models/pressureModel.js');
 
 app.listen(port);
+console.log('Server listening on port: ', port);
