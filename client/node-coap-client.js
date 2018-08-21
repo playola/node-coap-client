@@ -36,8 +36,35 @@ server.listen(function() {
 });
 
 function updateDatabase(value) {
-  console.log('Update database', value);
+  // Sava data in MongoDB
   postPressureIntoDatabase(value);
+
+  // Save data in TheThings.io
+  postPressureIntoPlatform(value);
+};
+
+/**
+* Save pressure value into MongoDB database.
+*/
+function postPressureIntoDatabase(value) {
+  var port = 8000;
+  var myIp = 'http://' + ip.address() + ':' + port;
+  console.log('posting on IP: ', myIp);
+  console.log('Update database', value);
+  //request.post(myIp + '/');
+  request.post({
+    headers: { 'content-type': 'application/json' },
+    url: myIp + '/',
+    body: value
+  }, function(error, response, body){
+    console.log(body);
+  });
+};
+
+/**
+* Save pressure value into platform database.
+*/
+function postPressureIntoPlatform(value) {
   var payload = {
     values: [{
       key: 'demo_resource',
@@ -58,10 +85,3 @@ function updateDatabase(value) {
 
   req.end();
 };
-
-function postPressureIntoDatabase(value) {
-  var port = 8000;
-  var myIp = 'http://' + ip.address() + ':' + port;
-  console.log('posting on IP: ', myIp);
-  request.post(myIp + '/');
-}
