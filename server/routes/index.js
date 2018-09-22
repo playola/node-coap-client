@@ -13,20 +13,24 @@ router.route('/')
   .post(function(req, res){
     req.on('data', function(src) {
       // Initialize model
-      var thisPressureModel = new pressureModel();
+      var pressureModel = new pressureModel();
       // Define values
-      var thisTimestamp = new Date();
-      var thisPressureValue = src.toString();
+      var modelId = 1234;
+      var modelTimestamp = new Date();
+      var modelPressure = src.toString();
+      var modelRoom = 0;
       // Set values into the model
-      thisPressureModel.timestamp = thisTimestamp;
-      thisPressureModel.pressure = thisPressureValue;
+      pressureModel.id = modelId;
+      pressureModel.timestamp = modelTimestamp;
+      pressureModel.pressure = modelPressure;
+      pressureModel.room = modelRoom;
 
       // Save the record to the db
-      thisPressureModel.save(function(err){
+      pressureModel.save(function(err){
         if(err){
           res.send(err);
         } else {
-          console.log('New pressure recorded in the database as:', thisPressureValue);
+          console.log('New pressure recorded in the database as:', modelPressure);
           res.send('New pressure recorded to the db');
         }
       });

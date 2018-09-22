@@ -17,6 +17,7 @@ server.on('request', function(req, res) {
 });
 
 server.listen(function() {
+  var previousValue = '1';
   coap
     .request({
       host: secrets.getSecret('coapHost'),
@@ -29,7 +30,10 @@ server.listen(function() {
 
       res.on('data', function(src) {
         var value = src.toString();
-        updateDatabase(value);
+        if(value !== previousValue) {
+          updateDatabase(value);
+        }
+        previousValue = value;
       });
     })
     .end()
