@@ -43,8 +43,11 @@ function updateDatabase(value) {
   // Sava data in MongoDB
   postPressureIntoDatabase(value);
 
-  // Save data in TheThings.io
+  // Save data in Watson
   postPressureIntoPlatform(value);
+
+  // Controller of an external Z-Wave light
+  zwaveController(value);
 };
 
 /**
@@ -55,7 +58,6 @@ function postPressureIntoDatabase(value) {
   var myIp = 'http://' + ip.address() + ':' + port;
   console.log('posting on IP: ', myIp);
   console.log('Update database', value);
-  //request.post(myIp + '/');
   request.post({
     headers: { 'content-type': 'application/json' },
     url: myIp + '/',
@@ -70,22 +72,56 @@ function postPressureIntoDatabase(value) {
 */
 function postPressureIntoPlatform(value) {
   var payload = {
-    values: [{
-      key: 'demo_resource',
-      value: Number(value)
-    }]
+    id: 666,
+    room: 6,
+    pressure: Number(value),
+    timestamp: new Date()
   };
 
-  var req = coap.request({
-    host: 'coap.thethings.io',
-    pathname: '/v2/things/' + secrets.getSecret('tokenId'),
-    method: 'POST'
-  });
-  req.write(JSON.stringify(payload));
+  console.log('Device simulator is connected to the IoT Foundation service');
+  console.log('QoS level set to: ' + QosLevel);
 
-  req.on('response', function(res) {
-    console.log('thethings.io response code: ', res.code);
-  });
-
-  req.end();
+  iotfClient.publish("DS_status", "json", JSON.stringify(payload) );
+  // Log out the emitted dataPacket
+  console.log(JSON.stringify(payload));
 };
+
+/**
+* Controller that turns on and off a Z-Wave light.
+*/
+function zwaveController(value) {
+  console.log('----- Connecting to Z-Wave light -----');
+  var lightStatus = 0;
+  if(value === '0') {
+    lightStatus = 255;
+  }
+  var loginPayload = {
+    form: true,
+    login: secrets.getSecret('zwaveAdmin'),
+    password: secrets.getSecret('zwavePassword'),
+    keepme: false,
+  };
+  request.post({
+    headers: { 'content-type': 'application/json' },
+    url: 'http://'
+    + secrets.getSecret('zwaveHost')
+    + '/ZAutomation/api/v1/login',
+    body: JSON.stringify(loginPayload)
+  }, function(error, response, body){
+    console.log('Login successfull!');
+    var parsedBody = JSON.parse(body);
+    var zwaveCookie = parsedBody.data.sid;
+    var zwaveCookieString = 'ZWAYSession=' + zwaveCookie;
+    request.post({
+      headers: {
+        'content-type': 'application/json',
+        'Cookie': zwaveCookieString,
+      },
+      url: 'http://'
+      + secrets.getSecret('zwaveHost')
+      + '/ZWaveAPI/Run/devices[3].instances[0].commandClasses[32].Set(' + lightStatus + ')'
+    }, function(error, response, body){
+      console.log('Light changed successfull!');
+    });
+  });
+}

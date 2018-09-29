@@ -15,10 +15,15 @@ router.route('/')
       // Initialize model
       var thisPressureModel = new pressureModel();
       // Define values
-      var modelId = 1234;
+      var modelId = 20;
       var modelTimestamp = new Date();
-      var modelPressure = src.toString();
-      var modelRoom = 0;
+      // Reverse pressure value
+      var pressure = '0';
+      if(src.toString() === '1') {
+        pressure = '1';
+      }
+      var modelPressure = pressure;
+      var modelRoom = 1;
       // Set values into the model
       thisPressureModel.id = modelId;
       thisPressureModel.timestamp = modelTimestamp;
