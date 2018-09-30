@@ -50,7 +50,7 @@ var appEnv = cfenv.getAppEnv();
 
 // WATSON IBM - Express server
  app.listen(appEnv.port, function() {
-     console.log('----- Server started on ' + appEnv.url + ' -----');
+     console.log('Server started on ' + appEnv.url);
   }).on('error', function(err) {
     if (err.errno === 'EADDRINUSE') {
         console.log('***** Server not started, port ' + appEnv.url + ' is busy *****');
@@ -123,7 +123,7 @@ function updateDatabase(value) {
 function postPressureIntoDatabase(value) {
   var port = 8000;
   var myIp = 'http://' + ip.address() + ':' + port;
-  ('--- New pressure recorded in Database (' + myIP + ') as: ' + value + '---');
+  console.log('--- New pressure recorded in Database (' + myIp + ') as: ' + value + ' ---');
   request.post({
     headers: { 'content-type': 'application/json' },
     url: myIp + '/',

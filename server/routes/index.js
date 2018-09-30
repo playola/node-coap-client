@@ -35,7 +35,7 @@ router.route('/')
         if(err){
           res.send(err);
         } else {
-          console.log('New pressure recorded in the database as:', modelPressure);
+          console.log('----- New pressure recorded in the database as:', modelPressure + ' -----');
           res.send('New pressure recorded to the db');
         }
       });
