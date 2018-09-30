@@ -9,9 +9,11 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cfenv": "^1.1.0",
     "coap": "^0.22.0",
     "concurrently": "^3.6.1",
     "express": "^4.16.3",
+    "ibmiotf": "^0.2.41",
     "ip": "^1.1.5",
     "mongoose": "^5.2.5",
     "request": "^2.87.0"
