@@ -1,13 +1,9 @@
 /*
 * Node CoAP Client
-* CoAP Client that observe a sensor and sends its value to a platform.
-* The platform thethings.io needs a TOKEN_ID to post data into their database.
-*
-* Default port 5638. Default action 'GET'
+* CoAP Client that observe a sensor and sends its value to a database and a platform.
 */
 
-//WATSON IBM Use sctrict mode
-'use strict';
+'use strict'; // WATSON IBM Use sctrict mode
 
 var coap = require('coap'),
     server = coap.createServer({ type: 'udp6' }),
@@ -21,78 +17,56 @@ var express = require('express'),
     cfenv = require('cfenv'); // The cfenv module helps to access the Cloud Foundry environment
 
 //------------------------------------------------------------------------------
-//WATSON IBM Change variable values in this section to customize emitted data
+// WATSON IBM - Customize emitted data
 //------------------------------------------------------------------------------
-
-//
-//WATSON IBM Name of the MQTT topic that the data should be published on
+// Name of the MQTT topic that the data should be published on
 var topicToBePublishedOn = 'myTopic';
-
-// WATSON IBM Wait this many seconds before publishing the next set of data
+// Wait this many seconds before publishing the next set of data
 var varIntervalBetweenData = 2;
-
-// WATSON IBM Quality of Serive for the publish event. Supported values : 0, 1, 2
+// Quality of Serive for the publish event. Supported values : 0, 1, 2
 var QosLevel = 0;
 
-// read the id of the IoT foundation org out of a local .env file
-// format of .env file:
-// iotf_org=<id of IoT Foundation organization>
+// Read the id of the IoT foundation org out of a local .env file
+// format of .env file: iotf_org=<id of IoT Foundation organization>
 require('dotenv').load();
 
-// WATSON IBM Note that the following configuration must match with the parameters that
-// the device-simulator was registered with. This device registration can
-// either be done in the dashboard of the IoT Foundation service or via its
-// API
-
+// WATSON IBM Device configuration
 var iotfConfig = {
-    "org" : process.env.iotf_org,
-    "id" : process.env.iotf_id,
-    "auth-token" : process.env.iotf_authtoken,
-    "type" : process.env.iotf_type,
-    "auth-method" : "token"
+    'org' : process.env.iotf_org,
+    'id' : process.env.iotf_id,
+    'auth-token' : process.env.iotf_authtoken,
+    'type' : process.env.iotf_type,
+    'auth-method' : 'token'
 };
 
 //------------------------------------------------------------------------------
-// Setup all the required node modules we'll need
+// WATSON IBM - Setup required node modules
 //------------------------------------------------------------------------------
-
-// WATSON IBM Initialize the app as an express application
+// Initialize the app as an express application
 var app = express();
 
-//WATSON IBM  get the application environment from Cloud Foundry
+// Get the application environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
-console.log('');
-console.log('--- DEBUG appENV: ---');
-console.log(appEnv);
-console.log('');
-
-//WATSON IBM ---Start the express server---------------------------------------------------
-
+// WATSON IBM - Express server
  app.listen(appEnv.port, function() {
-     console.log("Server started on " + appEnv.url);
+     console.log('----- Server started on ' + appEnv.url + ' -----');
   }).on('error', function(err) {
     if (err.errno === 'EADDRINUSE') {
-        console.log('Server not started, port ' + appEnv.url + ' is busy');
+        console.log('***** Server not started, port ' + appEnv.url + ' is busy *****');
     } else {
         console.log(err);
     }
 });
 
-//WATSON IBM ---Connect to the IoT Foundation service--------------------------------------
-
-console.log('');
-console.log('--- DEBUG iotConfig: ---');
-console.log(iotfConfig);
-console.log('');
-
-//WATSON IBM  Create a client (used to send data)
+//------------------------------------------------------------------------------
+// WATSON IBM - Connect to the IoT Foundation service
+//------------------------------------------------------------------------------
+// Create a client (used to send data)
 var iotfClient = new Iotf.IotfDevice(iotfConfig);
-
-//WATSON IBM  Connect to the initialized iotf service
+// Connect to the initialized iotf service
 iotfClient.connect();
-
-//WATSON IBM  Handle errors coming from the iotf service
+// Handle errors coming from the iotf service
 iotfClient.on('error', function (err) {
     if (err.message.indexOf('authorized') > -1) {
         console.log('');
@@ -104,7 +78,8 @@ iotfClient.on('error', function (err) {
 });
 
 server.on('request', function(req, res) {
-  res.end('Starting CoAP Client\n')
+  console.log('ON REQUEST');
+  res.end('----- Node CoAP Client end -----\n')
 });
 
 server.listen(function() {
@@ -136,7 +111,7 @@ function updateDatabase(value) {
   postPressureIntoDatabase(value);
 
   // Save data in Watson
-  //postPressureIntoPlatform(value);
+  postPressureIntoPlatform(value);
 
   // Controller of an external Z-Wave light
   zwaveController(value);
@@ -148,14 +123,13 @@ function updateDatabase(value) {
 function postPressureIntoDatabase(value) {
   var port = 8000;
   var myIp = 'http://' + ip.address() + ':' + port;
-  console.log('posting on IP: ', myIp);
-  console.log('Update database', value);
+  ('--- New pressure recorded in Database (' + myIP + ') as: ' + value + '---');
   request.post({
     headers: { 'content-type': 'application/json' },
     url: myIp + '/',
     body: value
   }, function(error, response, body){
-    console.log(body);
+    console.log('Pressure recorded successfull!');
   });
 };
 
@@ -163,19 +137,22 @@ function postPressureIntoDatabase(value) {
 * Save pressure value into platform database.
 */
 function postPressureIntoPlatform(value) {
+  // Reverse pressure value
+  var pressure = '0';
+  if(value === '0') {
+    pressure = '1';
+  }
+
   var payload = {
-    id: 666,
-    room: 6,
-    pressure: Number(value),
+    id: 20,
+    room: 1,
+    pressure: Number(pressure),
     timestamp: new Date(),
   };
 
-  console.log('Device simulator is connected to the IoT Foundation service');
-  console.log('QoS level set to: ' + QosLevel);
-
   iotfClient.publish('DS_status', 'json', JSON.stringify(payload) );
-  // Log out the emitted dataPacket
-  console.log(JSON.stringify(payload));
+
+  console.log('--- New pressure recorded in Watson as: ' + pressure + '---');
 };
 
 /**

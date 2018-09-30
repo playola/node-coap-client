@@ -19,7 +19,7 @@ router.route('/')
       var modelTimestamp = new Date();
       // Reverse pressure value
       var pressure = '0';
-      if(src.toString() === '1') {
+      if(src.toString() === '0') {
         pressure = '1';
       }
       var modelPressure = pressure;
